@@ -1,17 +1,19 @@
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
+import Header from './components/Header.jsx'
+import Upload from './screens/Upload.jsx'
+import Placeholder from './screens/Placeholder.jsx'
+import { useApp } from './store.js'
 
-// placeholder screens until design + components land
 export default function App() {
+  const screen = useApp((s) => s.screen)
   return (
-    <motion.main
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="min-h-screen bg-slate-950 text-white flex items-center justify-center"
-    >
-      <div className="text-center">
-        <h1 className="text-4xl font-bold">Flashcards</h1>
-        <p className="mt-2 text-slate-400">Vite + React + Tailwind + Framer Motion — готово к сборке экранов</p>
-      </div>
-    </motion.main>
+    <div className="flex min-h-screen flex-col">
+      <Header />
+      <AnimatePresence mode="wait">
+        <motion.div key={screen} className="flex flex-1 flex-col">
+          {screen === 'upload' && <Upload />}
+          <Placeholder screen={screen} />        </motion.div>
+      </AnimatePresence>
+    </div>
   )
 }
