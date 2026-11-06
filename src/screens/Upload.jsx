@@ -14,7 +14,7 @@ const rise = {
 }
 
 export default function Upload() {
-  const { setSourceText, sourceText, topic, setTopic, setScreen, screen } = useApp()
+  const { setSourceText, sourceText, topic, setTopic, generateCards, screen } = useApp()
   const [dragging, setDragging] = useState(false)
   const [fileInfo, setFileInfo] = useState('')
 
@@ -26,7 +26,7 @@ export default function Upload() {
 
   async function submit() {
     if (!sourceText.trim()) return
-    setScreen('loading') // Шаг 3: тут начнётся запрос к GigaChat
+    generateCards() // Шаг 3: GigaChat (mock) → карточки → экран колоды
   }
 
   return (
