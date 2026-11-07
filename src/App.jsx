@@ -2,7 +2,9 @@ import { AnimatePresence, motion } from 'framer-motion'
 import Header from './components/Header.jsx'
 import Upload from './screens/Upload.jsx'
 import Loading from './screens/Loading.jsx'
-import Placeholder from './screens/Placeholder.jsx'
+import Deck from './screens/Deck.jsx'
+import Stats from './screens/Stats.jsx'
+import Blitz from './screens/Blitz.jsx'
 import Login from './screens/Login.jsx'
 import Register from './screens/Register.jsx'
 import Main from './screens/Main.jsx'
@@ -31,7 +33,9 @@ export default function App() {
         <motion.div key={screen} className="flex flex-1 flex-col">
           {screen === 'upload' && <Upload />}
           {screen === 'loading' && <Loading />}
-          <Placeholder screen={screen} />
+          {screen === 'deck' && <Deck />}
+          {screen === 'stats' && <Stats />}
+          {screen === 'blitz' && <Blitz />}
         </motion.div>
       </AnimatePresence>
     </div>
