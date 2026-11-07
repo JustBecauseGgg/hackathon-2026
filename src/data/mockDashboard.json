@@ -1,0 +1,10 @@
+{
+  "greeting": "Сегодня тебя ждут 18 карточек для повторения. Начнём?",
+  "progress": { "percent": 67, "studied": 96, "total": 144, "left": 48 },
+  "lastTopic": { "subject": "Программирование", "title": "Функциональное программирование", "toReview": 5 },
+  "collections": [
+    { "icon": "shield", "subject": "Кибербезопасность", "title": "Протоколы безопасности", "subtitle": "HTTPS, HTTP и другие", "studied": 12, "total": 18, "repeat": 2 },
+    { "icon": "keyboard", "subject": "Программирование", "title": "Функциональное программирование", "subtitle": "Правила, смысл и применение", "studied": 23, "total": 28, "repeat": 2 },
+    { "icon": "function", "subject": "Математика", "title": "Дифференцирование", "subtitle": "Производные и дифференциалы", "studied": 12, "total": 24, "repeat": 2 }
+  ]
+}

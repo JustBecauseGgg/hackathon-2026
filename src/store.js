@@ -79,13 +79,13 @@ export const useApp = create((set, get) => ({
 
   async login(email, password) {
     const user = await loginUser(email, password)
-    set({ user, screen: 'upload' })
+    set({ user, screen: 'dashboard' })
     return user
   },
 
   async register(name, email, password) {
     const user = await registerUser(name, email, password)
-    set({ user, screen: 'upload' })
+    set({ user, screen: 'dashboard' })
     return user
   },
 

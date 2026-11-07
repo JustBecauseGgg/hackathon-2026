@@ -1,51 +1,40 @@
-import { motion } from 'framer-motion'
-import { Asterisk } from './icons.jsx'
 import { useApp } from '../store.js'
+import { Bell, VeritasLogo } from './icons.jsx'
 
-const nav = [
-  ['Колоды', 'stats'],
-  ['Учиться', 'upload'],
-  ['Блиц', 'blitz'],
-]
+// Шапка приложения по макету «Личный кабинет» (50:861): Veritas + разделы + профиль.
+// Пункты разделов пока декоративные (по решению команды), «Выход» оставлен, чтобы был способ разлогиниться
+const nav = ['Статистика', 'Обучение', 'Мой прогресс']
+
+const initials = (name) =>
+  name.split(/\s+/).map((w) => w[0]).join('').slice(0, 2).toUpperCase()
 
 export default function Header() {
-  const { screen, setScreen } = useApp()
-  return (
-    <header className="flex h-[100px] w-full items-center justify-between border-b border-line px-16">
-      <motion.button
-        whileHover={{ rotate: 90, transition: { duration: 0.35, ease: 'easeInOut' } }}
-        onClick={() => setScreen('upload')}
-        className="flex items-center gap-2.5"
-      >
-        <span className="flex size-8 items-center justify-center rounded bg-primary text-surface">
-          <Asterisk className="size-6" />
-        </span>
-        <span className="text-[29px] font-bold tracking-tight">StudStorm</span>
-      </motion.button>
+  const { user, logout } = useApp()
 
-      <nav className="flex gap-8 text-sm">
-        {nav.map(([label, to]) => (
-          <button
-            key={to}
-            onClick={() => setScreen(to)}
-            className={`transition-colors hover:text-primary ${screen === to ? 'text-primary' : ''}`}
-          >
+  return (
+    <header className="flex h-[100px] w-full shrink-0 items-center justify-between border-b border-line px-16 max-lg:px-6">
+      <div className="flex items-center gap-[10px]">
+        <VeritasLogo />
+        <span className="text-xl font-semibold leading-[1.05] tracking-[-0.6px]">Veritas</span>
+      </div>
+
+      <nav className="flex items-center gap-8 text-sm">
+        {nav.map((label, i) => (
+          <button key={label} className={`cursor-pointer transition-colors ${i === 0 ? 'text-primary' : 'hover:text-primary'}`}>
             {label}
           </button>
         ))}
       </nav>
 
-      <div className="flex items-center gap-6">
-        {user ? (
-          <>
-            <span className="text-sm text-ink border border-line rounded px-[18px] py-[13px]">{user.name}</span>
-            <button onClick={logout} className="cursor-pointer text-sm text-muted transition-colors hover:text-primary">
-              Выход
-            </button>
-          </>
-        ) : (
-          <span className="text-sm text-muted border border-line rounded px-[18px] py-[13px]">Гость</span>
-        )}
+      <div className="flex items-center gap-3">
+        <Bell />
+        <span className="flex size-9 items-center justify-center rounded-[100px] bg-[#f3e9e7] text-[13px] text-primary">
+          {initials(user?.name || 'Г')}
+        </span>
+        <span className="text-sm">{user?.name}</span>
+        <button onClick={logout} className="ml-2 cursor-pointer text-sm text-muted transition-colors hover:text-primary">
+          Выход
+        </button>
       </div>
     </header>
   )
