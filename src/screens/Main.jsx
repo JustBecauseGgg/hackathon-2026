@@ -169,7 +169,7 @@ export default function Main() {
                   <FileText />
                 </div>
                 <p className="flex-1 text-[15px] font-medium">Строение клетки</p>
-                <Check className="text-[#526143]" />
+                <Check className="size-5 shrink-0 text-[#526143]" />
               </div>
               <span className="h-px w-full bg-line" />
               <p className="font-serif text-[22px] leading-[1.65]">
