@@ -13,7 +13,7 @@ const MIN_ANSWER = 10
 
 // ключ кладём в .env.local (он в .gitignore через *.local), имя — VITE_ROUTERAI_KEY
 const API_URL = 'https://routerai.ru/api/v1/chat/completions'
-const MODEL = 'openai/'
+const MODEL = 'openai/gpt-oss-20b'
 const API_KEY = import.meta.env?.VITE_ROUTERAI_KEY
 
 export async function requestCards(text, topic, { mock = true } = {}) {
