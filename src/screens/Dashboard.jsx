@@ -2,11 +2,15 @@ import { useState } from 'react'
 import data from '../data/mockDashboard.json'
 import { useApp } from '../store.js'
 import {
-  ArrowRight, LayoutGrid,
-  Leaf, Search,
+  ArrowRight, BookOpen, Ellipsis, FunctionSquare, Keyboard, LayoutGrid,
+  Leaf, Search, Shield,
 } from '../components/icons.jsx'
 
 const filters = ['Все предметы']
+const cardIcons = { shield: Shield, function: FunctionSquare, keyboard: Keyboard }
+// иконка предмета: известные — из макета, остальные — учебник
+const topicIcon = (topic) =>
+  cardIcons[Object.keys(cardIcons).find((k) => topic.toLowerCase().includes(k))] || BookOpen
 
 const initial = (name) =>
   name.split(/\s+/).map((w) => w[0]).join('').slice(0, 2).toUpperCase()
@@ -185,35 +189,59 @@ export default function Dashboard() {
             </div>
           )}
 
-          <div className="flex flex-col gap-4">
+          {/* сетка 3 колонки, карточка по фрейму 50:1023 */}
+          <div className="grid w-full grid-cols-3 gap-6 max-lg:grid-cols-1">
             {topicVisible.length ? (
-              topicVisible.map((t) => (
-                <div
-                  key={t.topic}
-                  className="flex w-full items-center gap-7 rounded-[12px] border border-line bg-white p-6 pr-8 transition-shadow hover:shadow-[0_14px_30px_-22px_rgba(32,37,31,0.3)]"
-                >
-                  <div className="flex min-w-0 flex-1 flex-col gap-2">
-                    <p className="text-[11px] uppercase tracking-[0.8px] text-primary">{t.topic}</p>
-                    <p className="text-xl font-medium tracking-[-0.5px]">
-                      {t.cards} карточек · {t.sessions} {plural(t.sessions, 'сессия', 'сессии', 'сессий')}
-                    </p>
-                    <p className="text-sm text-muted">
-                      выучено {t.known} · ошибок {t.wrong} · время {fmtTime(t.timeMs)}
-                    </p>
-                  </div>
-                  <div className="flex shrink-0 flex-col items-end gap-2">
-                    <span className="text-[22px] font-medium tracking-[-0.8px] text-primary">{t.percent}%</span>
-                    <div className="h-[4px] w-[140px] overflow-hidden rounded-[2px] bg-[#eeede5]">
-                      <div className="h-full rounded-[2px] bg-primary" style={{ width: `${t.percent}%` }} />
+              topicVisible.map((t) => {
+                const Icon = topicIcon(t.topic)
+                return (
+                  <div
+                    key={t.topic}
+                    className="flex min-w-0 flex-col gap-5 rounded-[12px] border border-line bg-white p-7 transition-shadow hover:shadow-[0_14px_30px_-22px_rgba(32,37,31,0.3)]"
+                  >
+                    <div className="flex w-full items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <Icon className="shrink-0" />
+                        <p className="text-[11px] uppercase tracking-[0.8px] text-primary">{t.topic}</p>
+                      </div>
+                      <button className="cursor-pointer">
+                        <Ellipsis />
+                      </button>
                     </div>
-                    <span className="text-xs text-muted/70">
-                      {new Date(t.lastAt).toLocaleDateString('ru', { day: 'numeric', month: 'long' })}
-                    </span>
+                    <div className="flex flex-col gap-[10px]">
+                      <p className="min-h-[60px] text-[26px] font-medium leading-[1.2] tracking-[-0.8px] max-lg:min-h-0">
+                        {t.topic}
+                      </p>
+                      <p className="text-sm leading-[1.6] text-muted">
+                        {t.cards} {plural(t.cards, 'карточка', 'карточки', 'карточек')} ·{' '}
+                        {t.sessions} {plural(t.sessions, 'сессия', 'сессии', 'сессий')}
+                      </p>
+                    </div>
+                    <div className="flex flex-col gap-[10px]">
+                      <div className="flex w-full items-start justify-between text-xs">
+                        <p className="text-muted">Изучено {t.known} из {t.cards}</p>
+                        <p className="text-primary">{t.percent}%</p>
+                      </div>
+                      <div className="h-[4px] w-full overflow-hidden rounded-[2px] bg-[#eeede5]">
+                        <div className="h-full rounded-[2px] bg-primary" style={{ width: `${t.percent}%` }} />
+                      </div>
+                    </div>
+                    <div className="flex w-full items-center justify-between border-t border-line pt-[18px]">
+                      <p className="text-xs text-muted">
+                        {t.cards} карточек · время {fmtTime(t.timeMs)}
+                      </p>
+                      <button
+                        onClick={() => setScreen('upload')}
+                        className="cursor-pointer text-[13px] text-primary transition-opacity hover:opacity-70"
+                      >
+                        Учить ↗
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))
+                )
+              })
             ) : (
-              <div className="flex flex-col items-center gap-4 rounded-[12px] border border-dashed border-line px-8 py-14 text-center">
+              <div className="col-span-full flex flex-col items-center gap-4 rounded-[12px] border border-dashed border-line px-8 py-14 text-center">
                 <p className="text-lg font-medium tracking-tight">
                   {topics.length ? 'Ничего не найдено' : 'Пока нет прорешанных тем'}
                 </p>
