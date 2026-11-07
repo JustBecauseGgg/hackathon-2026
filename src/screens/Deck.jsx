@@ -11,11 +11,6 @@ const rise = {
   show: (i = 0) => ({ opacity: 1, y: 0, transition: { delay: i * 0.08, duration: 0.5, ease: [0.22, 1, 0.36, 1] } }),
 }
 
-function fmtTime(ms) {
-  const s = Math.max(1, Math.round(ms / 1000))
-  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
-}
-
 export default function Deck() {
   const { cards, queue, streaks, stats, topic, answer, resetDeck, setScreen } = useApp()
   const [dir, setDir] = useState(1) // 1 = вправо («Знаю»), -1 = влево
@@ -57,10 +52,8 @@ export default function Deck() {
     return () => window.removeEventListener('keydown', h)
   }, [])
 
-  /* ── финал колоды: конфетти + статистика сессии ── */
+  /* ── финал колоды: конфетти + отсылка к дашборду ── */
   if (completed) {
-    const ms = stats.finishedAt - stats.startedAt
-    const errPct = stats.answered ? Math.round((stats.wrong / stats.answered) * 100) : 0
     return (
       <section className="relative flex flex-1 flex-col items-center justify-center overflow-hidden px-16 py-16">
         <Confetti />
@@ -77,16 +70,8 @@ export default function Deck() {
           </motion.h1>
           <motion.p variants={rise} custom={2} className="mt-4 text-lg text-muted">
             Каждая карточка закрыта «Знаю». Ошибки вернулись в очередь — интервалы сработали.
+            Вся статистика сессии — в личном кабинете.
           </motion.p>
-
-          <motion.div variants={rise} custom={3} className="mt-10 grid w-full grid-cols-4 gap-px overflow-hidden rounded-md border border-line bg-line">
-            {[['Время', fmtTime(ms)], ['Ответов', stats.answered], ['Ошибок', `${errPct}%`], ['Карточек', cards.length]].map(([k, v]) => (
-              <div key={k} className="flex flex-col items-center gap-1 bg-white px-3 py-5">
-                <span className="text-[22px] font-semibold tracking-tight">{v}</span>
-                <span className="text-[10px] uppercase tracking-[1px] text-muted">{k}</span>
-              </div>
-            ))}
-          </motion.div>
 
           <motion.div variants={rise} custom={4} className="mt-10 flex items-center gap-4">
             <MagneticButton

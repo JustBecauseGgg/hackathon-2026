@@ -14,9 +14,22 @@ const initial = (name) =>
 
 // «Личный кабинет» (фрейм 50:860): приветствие, прогресс, последняя тема, подборки
 export default function Dashboard() {
-  const { user, setScreen, cards } = useApp()
+  const { user, setScreen, cards, decks } = useApp()
   const [subject, setSubject] = useState(filters[0])
   const [query, setQuery] = useState('')
+
+  // статистика освоения из реальных завершённых колод (вместо mock-процента)
+  const totalAnswered = decks.reduce((a, d) => a + d.answered, 0)
+  const totalKnown = decks.reduce((a, d) => a + d.known, 0)
+  const totalWrong = decks.reduce((a, d) => a + d.wrong, 0)
+  const totalCards = decks.reduce((a, d) => a + d.cards, 0)
+  const totalMs = decks.reduce((a, d) => a + d.timeMs, 0)
+  const masteryPct = totalAnswered ? Math.round((totalKnown / totalAnswered) * 100) : 0
+  const lastDeck = decks.length ? decks[decks.length - 1] : null
+  const fmtTime = (ms) => {
+    const s = Math.max(1, Math.round(ms / 1000))
+    return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
+  }
 
   const visible = data.collections.filter(
     (c) =>
@@ -60,20 +73,23 @@ export default function Dashboard() {
             </div>
             <div className="flex w-full items-center gap-8 max-lg:flex-col max-lg:items-stretch">
               <p className="text-[56px] font-medium tracking-[-2.5px] text-primary max-lg:text-[44px]">
-                {data.progress.percent}%
+                {masteryPct}%
               </p>
               <div className="flex min-w-0 flex-1 flex-col gap-3">
                 <p className="text-[13px] leading-[1.5] text-muted">
-                  {data.progress.studied} из {data.progress.total} карточек изучено
+                  {totalKnown} верных ответов из {totalAnswered} · ошибок {totalWrong}
                 </p>
                 <div className="h-[6px] w-full overflow-hidden rounded-[3px] bg-[#eeede5]">
-                  <div className="h-full rounded-[3px] bg-primary" style={{ width: `${data.progress.percent}%` }} />
+                  <div className="h-full rounded-[3px] bg-primary transition-[width] duration-500" style={{ width: `${masteryPct}%` }} />
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-2.5">
-              <Leaf className="shrink-0" />
-              <p className="text-xs leading-[1.5] text-muted">Осталось освоить {data.progress.left} карточек.</p>
+            <div className="flex items-center gap-6 text-xs text-muted">
+              <span className="flex items-center gap-2.5">
+                <Leaf className="shrink-0" />
+                Пройдено колод: {decks.length} · карточек: {totalCards}
+              </span>
+              <span>Время обучения: {fmtTime(totalMs)}</span>
             </div>
           </div>
 
@@ -82,12 +98,23 @@ export default function Dashboard() {
               <span className="size-[5px] shrink-0 bg-primary" />
               <span className="text-[11px] uppercase tracking-[1px] text-primary">Последняя тема</span>
             </div>
-            <p className="text-[26px] font-medium leading-[1.2] tracking-[-0.8px] max-lg:text-[22px]">
-              {data.lastTopic.title}
-            </p>
-            <p className="text-[13px] text-muted">
-              {data.lastTopic.subject} · {data.lastTopic.toReview} карточек к повторению
-            </p>
+            {lastDeck ? (
+              <>
+                <p className="text-[26px] font-medium leading-[1.2] tracking-[-0.8px] max-lg:text-[22px]">
+                  {lastDeck.topic}
+                </p>
+                <p className="text-[13px] text-muted">
+                  {lastDeck.cards} карточек · выучено {lastDeck.known} · ошибок {lastDeck.wrong}
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="text-[26px] font-medium leading-[1.2] tracking-[-0.8px] max-lg:text-[22px]">
+                  Пока нет пройденных колод
+                </p>
+                <p className="text-[13px] text-muted">Заверши первую колоду — она появится здесь.</p>
+              </>
+            )}
             <button
               onClick={continueTo}
               className="flex h-[44px] w-fit cursor-pointer items-center gap-2 rounded-md bg-gradient-to-r from-[#720a18] to-[#ac1328] px-4 text-[13px] font-medium text-white transition-opacity hover:opacity-90"
