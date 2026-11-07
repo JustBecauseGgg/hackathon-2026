@@ -109,5 +109,11 @@ export const useApp = create(persist(
     storage: createJSONStorage(() => localStorage),
     // сохраняем только историю колод и юзера — экран/очередь/текст конспекта остаются сессионными
     partialize: (s) => ({ decks: s.decks, user: s.user }),
+    // user восстановлен, а экран сессионный ('main') — сразу открываем дашборд
+    merge: (persisted, current) => ({
+      ...current,
+      ...persisted,
+      screen: persisted?.user ? 'dashboard' : current.screen,
+    }),
   },
 ))
