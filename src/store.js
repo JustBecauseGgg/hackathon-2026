@@ -22,6 +22,8 @@ export const useApp = create((set, get) => ({
   topic: '',
   setTopic: (topic) => set({ topic }),
   cards: [],
+  // история завершённых прогонов — данные дашборда (mock, в памяти)
+  decks: [],
   // очередь: id-шники карточек «на столе»; карточка уходит, когда «Знаю» ×2 подряд
   queue: [],
   streaks: {},
@@ -54,8 +56,21 @@ export const useApp = create((set, get) => ({
       wrong: stats.wrong + (known ? 0 : 1),
     }
     // очередь пуста ⇔ каждая карточка набрала «Знаю» 2 подряд → колода пройдена
-    if (!nextQueue.length && cards.length) nextStats.finishedAt = Date.now()
-    set({ queue: nextQueue, streaks: nextStreaks, stats: nextStats })
+    let nextDecks = get().decks
+    if (!nextQueue.length && cards.length) {
+      nextStats.finishedAt = Date.now()
+      nextDecks = [...nextDecks, {
+        id: `deck_${nextDecks.length + 1}`,
+        topic: get().topic || 'Без темы',
+        cards: cards.length,
+        answered: nextStats.answered,
+        known: nextStats.known,
+        wrong: nextStats.wrong,
+        timeMs: nextStats.finishedAt - stats.startedAt,
+        at: nextStats.finishedAt,
+      }]
+    }
+    set({ queue: nextQueue, streaks: nextStreaks, stats: nextStats, decks: nextDecks })
   },
 
   resetDeck() {

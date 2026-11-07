@@ -23,7 +23,8 @@ function useSwipeFeedback(x) {
 }
 
 // карточка: клик → 3D-флип, свайп → ответ; exit улетает в сторону последнего ответа
-export default function FlipCard({ card, stackDepth = 0, shakeKey = 0, flipKey = 0, onAnswer }) {
+// fast=true — блиц: втрое короче пружины, карточки летят быстрее
+export default function FlipCard({ card, stackDepth = 0, shakeKey = 0, flipKey = 0, fast = false, onAnswer }) {
   const [flipped, setFlipped] = useState(false)
   const x = useMotionValue(0)
   const { rotate, boxShadow, nahOpacity, knowOpacity } = useSwipeFeedback(x)
@@ -53,12 +54,12 @@ export default function FlipCard({ card, stackDepth = 0, shakeKey = 0, flipKey =
       data-card={card.id}
       initial={{ x: 0, y: 70, scale: 0.92, opacity: 0 }}
       variants={{
-        center: { x: 0, y: 0, scale: 1, opacity: 1, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } },
+        center: { x: 0, y: 0, scale: 1, opacity: 1, transition: { duration: fast ? 0.18 : 0.4, ease: [0.22, 1, 0.36, 1] } },
       }}
       animate={controls}
       exit={(dir) => ({
         x: dir * 560, y: 80, opacity: 0, scale: 0.95,
-        transition: { duration: 0.3, ease: 'easeIn' },
+        transition: { duration: fast ? 0.16 : 0.3, ease: 'easeIn' },
       })}
       drag="x"
       dragElastic={0.3}
@@ -72,7 +73,7 @@ export default function FlipCard({ card, stackDepth = 0, shakeKey = 0, flipKey =
         className="absolute inset-0"
         style={{ transformStyle: 'preserve-3d' }}
         animate={{ rotateY: flipped ? 180 : 0 }}
-        transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: fast ? 0.26 : 0.55, ease: [0.22, 1, 0.36, 1] }}
       >
         {/* лицо: вопрос */}
         <div
