@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { persist, createJSONStorage } from 'zustand/middleware'
 import { requestCards } from './api/gigachat.js'
 import { loginUser, registerUser } from './api/auth.js'
 
@@ -11,9 +12,10 @@ function freshDeck(cards) {
   }
 }
 
-// shortcut: всё состояние in-memory (без persist и БД, mock-данные) —
-// перезагрузка страницы сбрасывает прогресс; если нужно пережить reload, вешаем zustand/middleware persist
-export const useApp = create((set, get) => ({
+// shortcut: всё состояние in-memory (без БД, mock-данные); decks и user переживают
+// перезагрузку через localStorage persist — остальное (очередь, экран) сессия сбрасывает
+export const useApp = create(persist(
+  (set, get) => ({
   screen: 'main',
   user: null,
   setScreen: (screen) => set({ screen }),
@@ -101,4 +103,11 @@ export const useApp = create((set, get) => ({
   },
 
   logout: () => set({ user: null, screen: 'main' }),
-}))
+  }),
+  {
+    name: 'studstorm_state',
+    storage: createJSONStorage(() => localStorage),
+    // сохраняем только историю колод и юзера — экран/очередь/текст конспекта остаются сессионными
+    partialize: (s) => ({ decks: s.decks, user: s.user }),
+  },
+))
