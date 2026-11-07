@@ -8,13 +8,22 @@ const nav = [
   ['Статистика', 'dashboard'],
   ['Обучение', 'upload'],
 ]
+// к какой вкладке относим каждый экран (учебные экраны подсвечивают «Обучение»)
+const screenTab = {
+  dashboard: 'dashboard',
+  upload: 'upload',
+  loading: 'upload',
+  deck: 'upload',
+  blitz: 'upload',
+}
 
 const initials = (name) =>
   name.split(/\s+/).map((w) => w[0]).join('').slice(0, 2).toUpperCase()
 
 export default function Header() {
-  const { user, logout, setScreen } = useApp()
+  const { user, logout, setScreen, screen } = useApp()
   const [sfx, setSfx] = useState(() => sound.restore())
+  const activeTab = screenTab[screen]
 
   return (
     <header className="flex h-[100px] w-full shrink-0 items-center justify-between border-b border-line px-16 max-lg:px-6">
@@ -24,11 +33,13 @@ export default function Header() {
       </div>
 
       <nav className="flex items-center gap-8 text-sm">
-        {nav.map(([label, target], i) => (
+        {nav.map(([label, target]) => (
           <button
             key={label}
             onClick={() => setScreen(target)}
-            className={`cursor-pointer transition-colors ${i === 0 ? 'text-primary' : 'hover:text-primary'}`}
+            className={`cursor-pointer transition-colors ${
+              activeTab === target ? 'text-primary' : 'text-ink hover:text-primary'
+            }`}
           >
             {label}
           </button>
