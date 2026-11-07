@@ -52,10 +52,20 @@ class GigaChatController extends Controller
             return response()->json(['error' => 'Модель вернула не-JSON ответ', 'raw' => $raw], 502);
         }
 
-        // мягкая валидация структуры карточек + лимит 20
-        $cards = array_slice(array_values(array_filter($cards, fn ($c) =>
-            is_array($c) && ! empty($c['question']) && ! empty($c['answer'])
-        )), 0, 20);
+        // нормализация ключей (модель шлёт term/definition) + мягкая валидация + лимит 20
+        $cards = array_slice(array_values(array_filter(array_map(function ($c, $i) {
+            if (! is_array($c)) return null;
+            $q = $c['question'] ?? $c['term'] ?? null;
+            $a = $c['answer'] ?? $c['definition'] ?? null;
+            if (empty($q) || empty($a)) return null;
+            return [
+                'id' => $c['id'] ?? 'card_' . ($i + 1),
+                'question' => $q,
+                'answer' => $a,
+                'source_quote' => $c['source_quote'] ?? '',
+                'topic' => $c['topic'] ?? null,
+            ];
+        }, $cards, array_keys($cards)))), 0, 20);
 
         return response()->json(['cards' => $cards]);
     }
