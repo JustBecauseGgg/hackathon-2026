@@ -70,7 +70,7 @@ export default function Upload() {
               <span>{sourceText.trim().split(/\s+/).filter(Boolean).length} слов</span>            </div>
           </motion.div>
 
-          {/* Dropzone .txt / .docx */}
+          {/* Dropzone .txt / .docx / .pdf */}
           <label
             onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
             onDragLeave={() => setDragging(false)}
@@ -80,10 +80,10 @@ export default function Upload() {
             }`}
           >
             <input
-              type="file" accept=".txt,.docx" className="sr-only"
+              type="file" accept=".txt,.docx,.pdf" className="sr-only"
               onChange={(e) => e.target.files[0] && takeFile(e.target.files[0])}
             />
-            <span className="font-medium text-ink">Перетащи файл .txt / .docx</span>
+            <span className="font-medium text-ink">Перетащи файл .txt / .docx / .pdf</span>
             <span className="text-muted">или выбери кликом</span>
           </label>
 
