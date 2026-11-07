@@ -2,15 +2,22 @@ import { useState } from 'react'
 import data from '../data/mockDashboard.json'
 import { useApp } from '../store.js'
 import {
-  ArrowRight, ChevronDown, Ellipsis, FunctionSquare, Keyboard, LayoutGrid,
-  Leaf, Search, Shield,
+  ArrowRight, LayoutGrid,
+  Leaf, Search,
 } from '../components/icons.jsx'
 
-const cardIcons = { shield: Shield, function: FunctionSquare, keyboard: Keyboard }
-const filters = ['Все предметы', 'Математика', 'Программирование', 'Кибербезопасность']
+const filters = ['Все предметы']
 
 const initial = (name) =>
   name.split(/\s+/).map((w) => w[0]).join('').slice(0, 2).toUpperCase()
+
+const plural = (n, one, few, many) => {
+  const m10 = n % 10
+  const m100 = n % 100
+  if (m10 === 1 && m100 !== 11) return one
+  if (m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20)) return few
+  return many
+}
 
 // «Личный кабинет» (фрейм 50:860): приветствие, прогресс, последняя тема, подборки
 export default function Dashboard() {
@@ -31,11 +38,29 @@ export default function Dashboard() {
     return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
   }
 
-  const visible = data.collections.filter(
-    (c) =>
-      (subject === filters[0] || c.subject === subject) &&
-      (c.title + c.subject).toLowerCase().includes(query.trim().toLowerCase()),
-  )
+  // «Мои подборки» — реальные прорешанные колоды, сгруппированные по темам
+  const decksByTopic = decks.reduce((map, d) => {
+    ;(map[d.topic] ||= []).push(d)
+    return map
+  }, {})
+  const topics = Object.entries(decksByTopic)
+  const topicVisible = topics
+    .map(([topic, list]) => ({
+      topic,
+      sessions: list.length,
+      cards: list.reduce((a, d) => a + d.cards, 0),
+      known: list.reduce((a, d) => a + d.known, 0),
+      wrong: list.reduce((a, d) => a + d.wrong, 0),
+      timeMs: list.reduce((a, d) => a + d.timeMs, 0),
+      lastAt: Math.max(...list.map((d) => d.at)),
+      percent: Math.round((list.reduce((a, d) => a + d.known, 0) / Math.max(1, list.reduce((a, d) => a + d.answered, 0))) * 100),
+    }))
+    .filter((t) =>
+      (subject === filters[0] || t.topic === subject) &&
+      t.topic.toLowerCase().includes(query.trim().toLowerCase()),
+    )
+    .sort((a, b) => b.lastAt - a.lastAt)
+
   const continueTo = () => setScreen(cards.length ? 'deck' : 'upload')
 
   return (
@@ -142,71 +167,71 @@ export default function Dashboard() {
                 className="w-full bg-transparent text-sm outline-none placeholder:text-muted"
               />
             </div>
-            <button className="flex h-[50px] cursor-pointer items-center gap-5 rounded-md border border-line px-[18px] max-lg:w-fit">
-              <span className="text-[13px]">Сначала недавние</span>
-              <ChevronDown />
-            </button>
           </div>
 
-          <div className="flex flex-wrap items-start content-start gap-2">
-            {filters.map((f) => (
-              <button
-                key={f}
-                onClick={() => setSubject(f)}
-                className={`cursor-pointer rounded-[100px] border px-4 py-[10px] text-[12px] transition-colors ${
-                  subject === f ? 'border-primary bg-primary text-white' : 'border-line hover:border-muted'
-                }`}
-              >
-                {f}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex gap-6 max-lg:flex-col">
-            {visible.map((c) => {
-              const Icon = cardIcons[c.icon]
-              const percent = Math.round((c.studied / c.total) * 100)
-              return (
-                <div
-                  key={c.title}
-                  className="flex min-w-0 flex-1 flex-col gap-5 rounded-[12px] border border-line bg-white p-7 max-lg:w-auto"
+          {topics.length > 0 && (
+            <div className="flex flex-wrap items-start content-start gap-2">
+              {[filters[0], ...Object.keys(decksByTopic).filter((t) => !filters.includes(t))].map((f) => (
+                <button
+                  key={f}
+                  onClick={() => setSubject(f)}
+                  className={`cursor-pointer rounded-[100px] border px-4 py-[10px] text-[12px] transition-colors ${
+                    subject === f ? 'border-primary bg-primary text-white' : 'border-line hover:border-muted'
+                  }`}
                 >
-                  <div className="flex w-full items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <Icon />
-                      <p className="text-[11px] uppercase tracking-[0.8px] text-primary">{c.subject}</p>
-                    </div>
-                    <button className="cursor-pointer">
-                      <Ellipsis />
-                    </button>
-                  </div>
-                  <div className="flex flex-col gap-[10px]">
-                    <p className="min-h-[60px] text-[26px] font-medium leading-[1.2] tracking-[-0.8px] max-lg:min-h-0">
-                      {c.title}
+                  {f}
+                </button>
+              ))}
+            </div>
+          )}
+
+          <div className="flex flex-col gap-4">
+            {topicVisible.length ? (
+              topicVisible.map((t) => (
+                <div
+                  key={t.topic}
+                  className="flex w-full items-center gap-7 rounded-[12px] border border-line bg-white p-6 pr-8 transition-shadow hover:shadow-[0_14px_30px_-22px_rgba(32,37,31,0.3)]"
+                >
+                  <div className="flex min-w-0 flex-1 flex-col gap-2">
+                    <p className="text-[11px] uppercase tracking-[0.8px] text-primary">{t.topic}</p>
+                    <p className="text-xl font-medium tracking-[-0.5px]">
+                      {t.cards} карточек · {t.sessions} {plural(t.sessions, 'сессия', 'сессии', 'сессий')}
                     </p>
-                    <p className="text-sm leading-[1.6] text-muted">{c.subtitle}</p>
+                    <p className="text-sm text-muted">
+                      выучено {t.known} · ошибок {t.wrong} · время {fmtTime(t.timeMs)}
+                    </p>
                   </div>
-                  <div className="flex flex-col gap-[10px]">
-                    <div className="flex w-full items-start justify-between text-xs">
-                      <p className="text-muted">Изучено {c.studied} из {c.total}</p>
-                      <p className="text-primary">{percent}%</p>
+                  <div className="flex shrink-0 flex-col items-end gap-2">
+                    <span className="text-[22px] font-medium tracking-[-0.8px] text-primary">{t.percent}%</span>
+                    <div className="h-[4px] w-[140px] overflow-hidden rounded-[2px] bg-[#eeede5]">
+                      <div className="h-full rounded-[2px] bg-primary" style={{ width: `${t.percent}%` }} />
                     </div>
-                    <div className="h-[4px] w-full overflow-hidden rounded-[2px] bg-[#eeede5]">
-                      <div className="h-full rounded-[2px] bg-primary" style={{ width: `${percent}%` }} />
-                    </div>
-                  </div>
-                  <div className="flex w-full items-center justify-between border-t border-line pt-[18px]">
-                    <p className="text-xs text-muted">{c.total} карточек · Повторить: {c.repeat}</p>
-                    <button
-                      onClick={() => setScreen('upload')}
-                      className="cursor-pointer text-[13px] text-primary transition-opacity hover:opacity-70"
-                    >
-                      Учить ↗
-                    </button>
+                    <span className="text-xs text-muted/70">
+                      {new Date(t.lastAt).toLocaleDateString('ru', { day: 'numeric', month: 'long' })}
+                    </span>
                   </div>
                 </div>
-              )
-            })}
+              ))
+            ) : (
+              <div className="flex flex-col items-center gap-4 rounded-[12px] border border-dashed border-line px-8 py-14 text-center">
+                <p className="text-lg font-medium tracking-tight">
+                  {topics.length ? 'Ничего не найдено' : 'Пока нет прорешанных тем'}
+                </p>
+                <p className="max-w-[380px] text-sm text-muted">
+                  {topics.length
+                    ? 'Попробуй другой запрос или сбрось фильтр.'
+                    : 'Пройди первую колоду — её тема появится в подборках.'}
+                </p>
+                {!topics.length && (
+                  <button
+                    onClick={() => setScreen('upload')}
+                    className="rounded-md border border-line px-6 py-3 text-sm transition-colors hover:border-primary hover:text-primary"
+                  >
+                    Сделать карточки
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
