@@ -11,13 +11,28 @@ const MAX_CARDS = 20
 const MIN_TERM = 3
 const MIN_ANSWER = 10
 
-// shortcut: реальный GigaChat не подключён (нужен OAuth-токен_GigaChat API доступом);
-// включает когда выдадут ключ — requestCards(text, topic, { mock: false }) с тем же контрактом ответа
-export function requestCards(text, topic, { mock = true } = {}) {
-  if (!mock) return fetch('/api/gigachat', {
-    method: 'POST', headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({ system: SYSTEM_PROMPT, text, topic }),
-  }).then(r => r.json())
+// ключ кладём в .env.local (он в .gitignore через *.local), имя — VITE_ROUTERAI_KEY
+const API_URL = 'https://routerai.ru/api/v1/chat/completions'
+const MODEL = 'openai/'
+const API_KEY = import.meta.env?.VITE_ROUTERAI_KEY
+
+export async function requestCards(text, topic, { mock = true } = {}) {
+  if (!mock) {
+    const r = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${API_KEY}` },
+      body: JSON.stringify({
+        model: MODEL,
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          { role: 'user', content: `Тема: ${topic}\n\nТекст:\n${text}` },
+        ],
+      }),
+    })
+    if (!r.ok) throw new Error(`RouterAI ${r.status}: ${await r.text()}`)
+    const raw = (await r.json()).choices[0].message.content
+    return JSON.parse(raw.replace(/^```(?:json)?\s*|\s*```$/g, ''))
+  }
 
   const cards = extractFromText(text, topic)
   return new Promise((res) =>

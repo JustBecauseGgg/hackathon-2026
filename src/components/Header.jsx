@@ -36,7 +36,16 @@ export default function Header() {
       </nav>
 
       <div className="flex items-center gap-6">
-        <span className="text-sm text-muted border border-line rounded px-[18px] py-[13px]">Гость</span>
+        {user ? (
+          <>
+            <span className="text-sm text-ink border border-line rounded px-[18px] py-[13px]">{user.name}</span>
+            <button onClick={logout} className="cursor-pointer text-sm text-muted transition-colors hover:text-primary">
+              Выход
+            </button>
+          </>
+        ) : (
+          <span className="text-sm text-muted border border-line rounded px-[18px] py-[13px]">Гость</span>
+        )}
       </div>
     </header>
   )
