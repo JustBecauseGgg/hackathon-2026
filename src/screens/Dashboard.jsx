@@ -105,7 +105,7 @@ export default function Dashboard() {
                 opacity: { duration: 0.6, delay: 0.5 },
                 y: { duration: 7, times: [0, 0.12, 0.55, 0.75, 0.9], ease: 'easeInOut', repeat: Infinity, repeatDelay: 1.5 },
               }}
-              className="pointer-events-none absolute -top-[74px] left-1/2 z-0 w-[132px] -translate-x-1/2 max-lg:-top-[58px] max-lg:w-[104px]"
+              className="pointer-events-none absolute -top-[96px] left-[68%] z-0 w-[150px] -translate-x-1/2 max-lg:-top-[74px] max-lg:w-[116px]"
             >
               <Panda className="h-auto w-full" />
             </motion.div>
