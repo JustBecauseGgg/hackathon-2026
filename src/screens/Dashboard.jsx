@@ -1,9 +1,10 @@
 import { useState } from 'react'
+import { motion } from 'framer-motion'
 import data from '../data/mockDashboard.json'
 import { useApp } from '../store.js'
 import {
   ArrowRight, BookOpen, Ellipsis, FunctionSquare, Keyboard, LayoutGrid,
-  Leaf, Search, Shield,
+  Leaf, Panda, Search, Shield,
 } from '../components/icons.jsx'
 
 const filters = ['Все предметы']
@@ -95,7 +96,20 @@ export default function Dashboard() {
 
         {/* Прогресс и ближайшее занятие */}
         <div className="flex w-full items-stretch gap-6 max-lg:flex-col">
-          <div className="flex w-[842px] shrink-0 flex-col gap-6 rounded-[12px] border border-line bg-white p-7 max-lg:w-auto">
+          <div className="relative w-[842px] shrink-0 max-lg:w-auto">
+            {/* панда выглядывает из-за плитки прогресса: тело спрятано за карточкой */}
+            <motion.div
+              initial={{ y: 40, opacity: 0 }}
+              animate={{ y: [40, 0, 0, 12, 0], opacity: 1 }}
+              transition={{
+                opacity: { duration: 0.6, delay: 0.5 },
+                y: { duration: 7, times: [0, 0.12, 0.55, 0.75, 0.9], ease: 'easeInOut', repeat: Infinity, repeatDelay: 1.5 },
+              }}
+              className="pointer-events-none absolute -top-[74px] left-1/2 z-0 w-[132px] -translate-x-1/2 max-lg:-top-[58px] max-lg:w-[104px]"
+            >
+              <Panda className="h-auto w-full" />
+            </motion.div>
+            <div className="relative z-10 flex flex-col gap-6 rounded-[12px] border border-line bg-white p-7">
             <div className="flex w-full items-start justify-between">
               <p className="text-xl font-medium tracking-[-0.5px]">Твой прогресс</p>
               <p className="text-[11px] text-muted">За всё время</p>
@@ -119,6 +133,7 @@ export default function Dashboard() {
                 Пройдено колод: {decks.length} · карточек: {totalCards}
               </span>
               <span>Время обучения: {fmtTime(totalMs)}</span>
+            </div>
             </div>
           </div>
 
