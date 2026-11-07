@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { motion, useAnimation, useMotionValue, useTransform } from 'framer-motion'
+import { sound } from '../utils/sound.js'
 
 const SWIPE = 84 // px, после которых свайп считается ответом
 
@@ -41,7 +42,7 @@ export default function FlipCard({ card, stackDepth = 0, shakeKey = 0, flipKey =
     })
   }, [shakeKey])
 
-  useEffect(() => { if (flipKey) setFlipped((f) => !f) }, [flipKey])
+  useEffect(() => { if (flipKey) { sound.flip(); setFlipped((f) => !f) } }, [flipKey])
 
   function handleDragEnd(_, info) {
     if (info.offset.x > SWIPE) onAnswer({ known: true, swipe: true })
@@ -66,7 +67,7 @@ export default function FlipCard({ card, stackDepth = 0, shakeKey = 0, flipKey =
       dragConstraints={{ left: 0, right: 0 }}
       onDragEnd={handleDragEnd}
       style={{ x, rotate, boxShadow, zIndex: 20 - stackDepth, transformStyle: 'preserve-3d' }}
-      onClick={() => { if (Math.abs(x.get()) > 12) return; setFlipped((f) => !f) }}
+      onClick={() => { if (Math.abs(x.get()) > 12) return; sound.flip(); setFlipped((f) => !f) }}
     >
       {/* внутренняя 3D-начинка */}
       <motion.div

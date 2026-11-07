@@ -4,6 +4,7 @@ import FlipCard from '../components/FlipCard.jsx'
 import MagneticButton from '../components/MagneticButton.jsx'
 import { ArrowUpRight } from '../components/icons.jsx'
 import { useApp } from '../store.js'
+import { sound } from '../utils/sound.js'
 
 const rise = {
   hidden: { opacity: 0, y: 24 },
@@ -33,6 +34,7 @@ export default function Deck() {
   function handleAnswer({ known, swipe = false }) {
     if (locked.current || !currentId) return
     setDir(known ? 1 : -1)
+    known ? sound.know() : sound.nah()
     // по кнопке «Не знаю» — сначала трясём, потом улетает; свайп уходит сразу
     if (!known && !swipe) {
       locked.current = true
@@ -43,6 +45,7 @@ export default function Deck() {
     answer(known)
   }
 
+  useEffect(() => { if (sound.enabled()) sound.fanfare() }, [completed])
   // клавиатура: пробел — флип, ←/→ — ответы
   useEffect(() => {
     const h = (e) => {

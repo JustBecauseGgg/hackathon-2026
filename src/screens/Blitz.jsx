@@ -4,6 +4,7 @@ import FlipCard from '../components/FlipCard.jsx'
 import MagneticButton from '../components/MagneticButton.jsx'
 import { ArrowUpRight } from '../components/icons.jsx'
 import { useApp } from '../store.js'
+import { sound } from '../utils/sound.js'
 
 const BLITZ_MS = 5 * 60 * 1000
 const rise = {
@@ -100,6 +101,7 @@ export default function Blitz() {
   const card = list[i % list.length]
 
   function handle({ known }) {
+    known ? sound.know() : sound.nah()
     setResults((r) => ({ answered: r.answered + 1, known: r.known + (known ? 1 : 0) }))
     setI((v) => v + 1)
   }
