@@ -1,4 +1,4 @@
-import seedUsers from '../data/mockUsers.json'
+import seedUsers from '../data/mockUsers.json' with { type: 'json' }
 
 // shortcut: картотека пользователей живёт только в памяти — reload страницы её сбрасывает;
 // заводим бэкенд, когда он появится
