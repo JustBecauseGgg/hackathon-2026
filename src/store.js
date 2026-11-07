@@ -29,13 +29,14 @@ export const useApp = create((set, get) => ({
   streaks: {},
   stats: { answered: 0, known: 0, wrong: 0, startedAt: null, finishedAt: null },
 
-  async generateCards() {
-    const { sourceText, topic } = get()
-    set({ screen: 'loading' })
-    const cards = await requestCards(sourceText, topic, { mock: !import.meta.env?.VITE_ROUTERAI_KEY })
-    set({ ...freshDeck(cards), cards, screen: 'deck' })
-    return cards
-  },
+    async generateCards() {
+      const { sourceText, topic } = get()
+      set({ screen: 'loading' })
+      // shortcut: VITE_USE_MOCK=1 в .env.local принудительно включает mock (демо без бэкенда)
+      const cards = await requestCards(sourceText, topic, { mock: import.meta.env?.VITE_USE_MOCK === '1' })
+      set({ ...freshDeck(cards), cards, screen: 'deck' })
+      return cards
+    },
 
   //.interval-логика: «Не знаю» — стрик сброс и назад через 2 карточки;
   // «Знаю» — +1 стрик, если ещё не 2 → назад через 3 карточки, иначе уходит навсегда

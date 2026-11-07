@@ -11,33 +11,35 @@ const MAX_CARDS = 20
 const MIN_TERM = 3
 const MIN_ANSWER = 10
 
-// ключ кладём в .env.local (он в .gitignore через *.local), имя — VITE_ROUTERAI_KEY
-const API_URL = 'https://routerai.ru/api/v1/chat/completions'
-const MODEL = 'openai/gpt-oss-20b'
-const API_KEY = import.meta.env?.VITE_ROUTERAI_KEY
+// shortcut: пока нет VITE_USE_MOCK=1 — сначала пробуем Laravel-прокси (/api/gigachat),
+// при недоступном бэкенде падаем на честный mock, чтобы демо не умирало
+async function requestCardsViaBackend(text, topic) {
+  const r = await fetch('/api/gigachat/cards', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text, topic }),
+  })
+  const data = await r.json()
+  if (!r.ok) throw new Error(data.error || `Backend ${r.status}`)
+  return data.cards
+}
 
-export async function requestCards(text, topic, { mock = true } = {}) {
-  if (!mock) {
-    const r = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${API_KEY}` },
-      body: JSON.stringify({
-        model: MODEL,
-        messages: [
-          { role: 'system', content: SYSTEM_PROMPT },
-          { role: 'user', content: `Тема: ${topic}\n\nТекст:\n${text}` },
-        ],
-      }),
-    })
-    if (!r.ok) throw new Error(`RouterAI ${r.status}: ${await r.text()}`)
-    const raw = (await r.json()).choices[0].message.content
-    return JSON.parse(raw.replace(/^```(?:json)?\s*|\s*```$/g, ''))
+export async function requestCards(text, topic, { mock = false } = {}) {
+  if (mock) {
+    const cards = extractFromText(text, topic)
+    return new Promise((res) =>
+      setTimeout(() => res(cards), 1500 + Math.random() * 500),
+    )
   }
-
-  const cards = extractFromText(text, topic)
-  return new Promise((res) =>
-    setTimeout(() => res(cards), 1500 + Math.random() * 500),
-  )
+  try {
+    return await requestCardsViaBackend(text, topic)
+  } catch (e) {
+    // бэкенд не поднят / сеть — mock-фолбэк (честное извлечение из текста)
+    console.warn('GigaChat через бэкенд недоступен, mock:', e.message)
+    const cards = extractFromText(text, topic)
+    if (!cards.length) throw e
+    return cards
+  }
 }
 
 // Honest mock: как и настоящий ИИ по промпту, извлекает ТОЛЬКО из текста —

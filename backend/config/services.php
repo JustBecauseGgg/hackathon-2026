@@ -35,4 +35,7 @@ return [
         ],
     ],
 
+    // GigaChat через роутер (routerai) — ключ только на бэкенде
+    'gigachat' => include __DIR__.'/services.gigachat.php',
+
 ];
