@@ -5,7 +5,7 @@ import { loginUser, registerUser } from './api/auth.js'
 // shortcut: всё состояние in-memory (без persist и БД, mock-данные) —
 // перезагрузка страницы сбрасывает прогресс; если нужно пережить reload, вешаем zustand/middleware persist
 export const useApp = create((set, get) => ({
-  screen: 'login',
+  screen: 'main',
   user: null,
   setScreen: (screen) => set({ screen }),
   sourceText: '',
@@ -34,5 +34,5 @@ export const useApp = create((set, get) => ({
     return user
   },
 
-  logout: () => set({ user: null, screen: 'login' }),
+  logout: () => set({ user: null, screen: 'main' }),
 }))

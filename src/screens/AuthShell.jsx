@@ -11,9 +11,9 @@ export default function AuthShell({ children }) {
           <VeritasLogo />
           <span className="text-xl font-semibold leading-[1.05] tracking-[-0.6px]">Veritas</span>
         </div>
-        {/* shortcut: «На главную» — входная точка приложения, но без user гейт App возвращает на «Вход» */}
+        {/* публичная главная лендинга */}
         <button
-          onClick={() => setScreen('upload')}
+          onClick={() => setScreen('main')}
           className="text-sm text-muted transition-colors hover:text-ink"
         >
           ← На главную
