@@ -4,11 +4,9 @@ import { Bell, VeritasLogo, Volume2, VolumeX } from './icons.jsx'
 import { sound } from '../utils/sound.js'
 
 // Шапка приложения по макету «Личный кабинет» (50:861): Veritas + разделы + профиль.
-// «Мой прогресс» пока декоративный (нет своего экрана), остальные ведут на реальные экраны
 const nav = [
   ['Статистика', 'dashboard'],
   ['Обучение', 'upload'],
-  ['Мой прогресс', null], // shortcut: экрана ещё нет — пункт неактивен
 ]
 
 const initials = (name) =>
@@ -29,8 +27,8 @@ export default function Header() {
         {nav.map(([label, target], i) => (
           <button
             key={label}
-            onClick={() => target && setScreen(target)}
-            className={`transition-colors ${target ? 'cursor-pointer' : 'cursor-default opacity-50'} ${i === 0 ? 'text-primary' : ''} ${target && i !== 0 ? 'hover:text-primary' : ''}`}
+            onClick={() => setScreen(target)}
+            className={`cursor-pointer transition-colors ${i === 0 ? 'text-primary' : 'hover:text-primary'}`}
           >
             {label}
           </button>
