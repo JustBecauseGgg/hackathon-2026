@@ -55,7 +55,7 @@ export const useApp = create((set, get) => ({
     const [id, ...rest] = queue
     const nextStreaks = { ...streaks, [id]: known ? (streaks[id] || 0) + 1 : 0 }
     let nextQueue = rest
-    if (nextStreaks[id] < 2) {
+    if (nextStreaks[id] < 2 && nextQueue.length) {
       const at = Math.min(known ? 3 : 2, nextQueue.length)
       nextQueue = [...nextQueue.slice(0, at), id, ...nextQueue.slice(at)]
     }
@@ -65,7 +65,8 @@ export const useApp = create((set, get) => ({
       known: stats.known + (known ? 1 : 0),
       wrong: stats.wrong + (known ? 0 : 1),
     }
-    // очередь пуста ⇔ каждая карточка набрала «Знаю» 2 подряд → колода пройдена
+    // очередь пуста ⇔ каждая карточка набрала «Знаю» 2 подряд (или колода из 1 карточки,
+  // где reinsert физически некуда ставить) → колода пройдена
     let nextDecks = get().decks
     if (!nextQueue.length && cards.length) {
       nextStats.finishedAt = Date.now()
