@@ -14,9 +14,12 @@ const rise = {
 }
 
 export default function Upload() {
-  const { setSourceText, sourceText, topic, setTopic, generateCards, screen } = useApp()
+  const { setSourceText, sourceText, topic, setTopic, generateCards, screen, genError } = useApp()
   const [dragging, setDragging] = useState(false)
   const [fileInfo, setFileInfo] = useState('')
+
+  const wordCount = sourceText.trim().split(/\s+/).filter(Boolean).length
+  const tooShort = wordCount > 0 && wordCount < 4
 
   async function takeFile(f) {
     const text = await extractText(f)
@@ -64,8 +67,7 @@ export default function Upload() {
             />
             <div className="mt-3 flex items-center justify-between text-xs text-muted">
               <span>{fileInfo || 'или загрузи файл ниже'}</span>
-              <span>{sourceText.trim().split(/\s+/).filter(Boolean).length} слов</span>
-            </div>
+              <span>{sourceText.trim().split(/\s+/).filter(Boolean).length} слов</span>            </div>
           </motion.div>
 
           {/* Dropzone .txt / .docx */}
@@ -96,7 +98,7 @@ export default function Upload() {
         <motion.div variants={rise} custom={4} className="flex items-center gap-6 pt-1">
           <MagneticButton
             onClick={submit}
-            disabled={!sourceText.trim()}
+            disabled={!sourceText.trim() || tooShort}
             className="flex h-14 w-auto cursor-pointer items-center gap-6 rounded-md bg-primary px-6 text-base text-white transition-opacity disabled:cursor-not-allowed disabled:opacity-40"
           >
             {screen === 'loading' ? 'Генерация…' : 'Сделать карточки'}
@@ -107,6 +109,18 @@ export default function Upload() {
             <span>ИИ вытащит только то, что написано в тексте</span>
           </div>
         </motion.div>
+
+        {genError && (
+          <motion.p
+            initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }}
+            className="text-sm text-[#b3261e]"
+          >
+            {genError}
+          </motion.p>
+        )}
+        {tooShort && !genError && (
+          <p className="text-sm text-muted">Добавь ещё текст — нужно хотя бы пара предложений с определениями.</p>
+        )}
       </div>
 
       {/* Правая колонка — живой превью карточки */}

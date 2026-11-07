@@ -22,6 +22,10 @@ export const useApp = create((set, get) => ({
   topic: '',
   setTopic: (topic) => set({ topic }),
   cards: [],
+  // ошибка генерации (показывается на Upload) — null, когда всё ок
+  genError: null,
+  // ошибка генерации (показывается на Upload) — null, когда всё ок
+  genError: null,
   // история завершённых прогонов — данные дашборда (mock, в памяти)
   decks: [],
   // очередь: id-шники карточек «на столе»; карточка уходит, когда «Знаю» ×2 подряд
@@ -31,11 +35,16 @@ export const useApp = create((set, get) => ({
 
     async generateCards() {
       const { sourceText, topic } = get()
-      set({ screen: 'loading' })
-      // shortcut: VITE_USE_MOCK=1 в .env.local принудительно включает mock (демо без бэкенда)
-      const cards = await requestCards(sourceText, topic, { mock: import.meta.env?.VITE_USE_MOCK === '1' })
-      set({ ...freshDeck(cards), cards, screen: 'deck' })
-      return cards
+      set({ screen: 'loading', genError: null })
+      try {
+        // shortcut: VITE_USE_MOCK=1 в .env.local принудительно включает mock (демо без бэкенда)
+        const cards = await requestCards(sourceText, topic, { mock: import.meta.env?.VITE_USE_MOCK === '1' })
+        set({ ...freshDeck(cards), cards, screen: 'deck' })
+        return cards
+      } catch (e) {
+        set({ screen: 'upload', genError: e.message })
+        return []
+      }
     },
 
   //.interval-логика: «Не знаю» — стрик сброс и назад через 2 карточки;

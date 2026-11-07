@@ -12,15 +12,20 @@ const MIN_TERM = 3
 const MIN_ANSWER = 10
 
 // shortcut: пока нет VITE_USE_MOCK=1 — сначала пробуем Laravel-прокси (/api/gigachat),
-// при недоступном бэкенде падаем на честный mock, чтобы демо не умирало
+// при недоступном бэкенде падаем на честный mock, чтобы демо не умирало.
+// 422 (валидация текста) — НЕ фолбэким на mock: показываем ошибку как есть.
 async function requestCardsViaBackend(text, topic) {
   const r = await fetch('/api/gigachat/cards', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ text, topic }),
   })
-  const data = await r.json()
-  if (!r.ok) throw new Error(data.error || `Backend ${r.status}`)
+  const data = await r.json().catch(() => ({}))
+  if (!r.ok) {
+    const err = new Error(data.error || `Backend ${r.status}`)
+    err.status = r.status
+    throw err
+  }
   return data.cards
 }
 
@@ -34,7 +39,9 @@ export async function requestCards(text, topic, { mock = false } = {}) {
   try {
     return await requestCardsViaBackend(text, topic)
   } catch (e) {
-    // бэкенд не поднят / сеть — mock-фолбэк (честное извлечение из текста)
+    // ошибка валидации (422) — отдаём пользователю, не маскируем mock'ом
+    if (e.status === 422) throw e
+    // бэкенд не поднят / сеть / 5xx — mock-фолбэк (честное извлечение из текста)
     console.warn('GigaChat через бэкенд недоступен, mock:', e.message)
     const cards = extractFromText(text, topic)
     if (!cards.length) throw e

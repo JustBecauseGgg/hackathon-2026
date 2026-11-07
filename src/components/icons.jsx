@@ -41,7 +41,7 @@ export const VeritasLogo = (props) => (
     <path d="M22.2862 8.26667L20.4153 18.7591H16L22.2862 8.26667Z" fill="#720A18" />
     <path d="M17.9645 29.2515L19.8355 18.7591H24.2507L17.9645 29.2515Z" fill="#720A18" />
     <defs>
-      <filter id="veritas-book-shadow" x="9.92995" y="6.22307" width="26.4003" height="34.6798" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <filter id="veritas-book-shadow" x="9.92995" y="6.22307" width="26.4003" height="34.6798" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
         <feFlood floodOpacity="0" result="BackgroundImageFix" />
         <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
         <feOffset dx="-3" dy="4" />
