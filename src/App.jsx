@@ -4,7 +4,6 @@ import Dashboard from './screens/Dashboard.jsx'
 import Upload from './screens/Upload.jsx'
 import Loading from './screens/Loading.jsx'
 import Deck from './screens/Deck.jsx'
-import Stats from './screens/Stats.jsx'
 import Blitz from './screens/Blitz.jsx'
 import Login from './screens/Login.jsx'
 import Register from './screens/Register.jsx'
@@ -36,7 +35,6 @@ export default function App() {
           {screen === 'upload' && <Upload />}
           {screen === 'loading' && <Loading />}
           {screen === 'deck' && <Deck />}
-          {screen === 'stats' && <Stats />}
           {screen === 'blitz' && <Blitz />}
         </motion.div>
       </AnimatePresence>
