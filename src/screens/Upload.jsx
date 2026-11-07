@@ -132,16 +132,16 @@ export default function Upload() {
         <motion.div
           animate={{ y: [0, -10, 0], rotate: [0, 1.2, 0] }}
           transition={{ repeat: Infinity, duration: 5, ease: 'easeInOut' }}
-          className="w-[360px] rounded-lg border border-line bg-white p-8 shadow-[0_24px_60px_-24px_rgba(32,37,31,0.25)]"
+          className="w-[460px] rounded-lg border border-line bg-white p-10 shadow-[0_32px_80px_-28px_rgba(32,37,31,0.3)]"
           style={{ borderRadius: '8px 120px 8px 8px' }}
         >
-          <div className="flex items-center gap-2.5">
-            <span className="size-1.5 bg-primary" />
-            <span className="text-xs tracking-[1.2px] text-primary uppercase">Так выглядит</span>
+          <div className="flex items-center gap-3">
+            <span className="size-2 bg-primary" />
+            <span className="text-[13px] tracking-[1.4px] text-primary uppercase">Так выглядит</span>
           </div>
-          <p className="mt-5 text-[24px] font-semibold tracking-tight">Термин</p>
-          <p className="mt-3 text-sm leading-[1.6] text-muted">Переверни — увидишь определение и цитату из твоего конспекта внизу мелким шрифтом.</p>
-          <p className="mt-8 border-t border-line pt-4 font-serif text-xs italic text-muted">«это будет цитата из твоего текста»</p>
+          <p className="mt-7 text-[34px] font-semibold tracking-[-0.8px]">Термин</p>
+          <p className="mt-4 text-[16px] leading-[1.6] text-muted">Переверни — увидишь определение и цитату из твоего конспекта внизу мелким шрифтом.</p>
+          <p className="mt-10 border-t border-line pt-5 font-serif text-[15px] italic text-muted">«это будет цитата из твоего текста»</p>
         </motion.div>
       </motion.div>
     </motion.section>
