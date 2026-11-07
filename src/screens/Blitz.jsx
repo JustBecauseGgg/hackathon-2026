@@ -78,7 +78,7 @@ export default function Blitz() {
             «Знаю»: {results.known} · точность {acc}%
           </motion.p>
           <motion.div custom={3} variants={rise} className="mt-10 flex items-center gap-4">
-            <MagneticButton onClick={() => setScreen('stats')}
+            <MagneticButton onClick={() => setScreen('dashboard')}
               className="flex h-14 items-center gap-5 rounded-md bg-primary px-6 text-base text-white">
               К дашборду <ArrowUpRight className="size-5" />
             </MagneticButton>

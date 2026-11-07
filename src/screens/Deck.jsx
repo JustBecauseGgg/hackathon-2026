@@ -75,7 +75,7 @@ export default function Deck() {
 
           <motion.div variants={rise} custom={4} className="mt-10 flex items-center gap-4">
             <MagneticButton
-              onClick={() => setScreen('stats')}
+              onClick={() => setScreen('dashboard')}
               className="flex h-14 items-center gap-5 rounded-md bg-primary px-6 text-base text-white"
             >
               К дашборду
