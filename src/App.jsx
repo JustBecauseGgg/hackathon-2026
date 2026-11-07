@@ -3,6 +3,7 @@ import Header from './components/Header.jsx'
 import Upload from './screens/Upload.jsx'
 import Loading from './screens/Loading.jsx'
 import Placeholder from './screens/Placeholder.jsx'
+import Deck from './screens/Deck.jsx'
 import Login from './screens/Login.jsx'
 import Register from './screens/Register.jsx'
 import { useApp } from './store.js'
@@ -29,6 +30,7 @@ export default function App() {
         <motion.div key={screen} className="flex flex-1 flex-col">
           {screen === 'upload' && <Upload />}
           {screen === 'loading' && <Loading />}
+          {screen === 'deck' && <Deck />}
           <Placeholder screen={screen} />
         </motion.div>
       </AnimatePresence>
