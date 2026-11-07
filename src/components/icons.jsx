@@ -202,6 +202,38 @@ export const BookmarkLg = (props) => (
   </svg>
 )
 
+// Иконки экрана «Обучение» из макета (фрейм 50:797) — path выкачаны из Figma
+export const XClose = (props) => (
+  <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <path d="M13.5 4.5 4.5 13.5M4.5 4.5l9 9" strokeWidth="1.6" strokeLinecap="round" stroke="currentColor" />
+  </svg>
+)
+export const Rotate3D = (props) => (
+  <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <path d="M12.349 5.62484C11.7318 3.1774 10.4635 1.49951 8.99951 1.49951C6.92876 1.49951 5.24951 4.85753 5.24951 9.00011C5.24951 13.1427 6.92876 16.5007 8.99951 16.5007C9.25601 16.5007 9.50726 16.449 9.74951 16.3507M11.3953 10.2805 14.2558 11.6756 12.8608 14.5363M14.2495 11.6778C12.8965 12.3416 11.044 12.7504 8.99951 12.7504C4.85726 12.7504 1.49951 11.071 1.49951 9.00011C1.49951 6.9292 4.85726 5.24981 8.99951 5.24981C12.628 5.24981 15.6543 6.53841 16.3495 8.25005" strokeWidth="1.6" strokeLinecap="round" stroke="currentColor" />
+  </svg>
+)
+export const CheckPlain = (props) => (
+  <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <path d="M14.9993 4.5 6.75011 12.7494 3.00049 8.99967" strokeWidth="1.6" strokeLinecap="round" stroke="currentColor" />
+  </svg>
+)
+export const MoveLeft = (props) => (
+  <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <path d="M3.99964 10.6674 1.33276 8.00021l2.66688-2.6672M1.33276 8.00021H14.6672" strokeWidth="1.6" strokeLinecap="round" stroke="currentColor" />
+  </svg>
+)
+export const MoveRight = (props) => (
+  <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <path d="M12.0003 10.6674 14.6672 8.00021l-2.6669-2.6672M14.6672 8.00021H1.33276" strokeWidth="1.6" strokeLinecap="round" stroke="currentColor" />
+  </svg>
+)
+export const BookmarkMuted = (props) => (
+  <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <path d="M13.8113 2.68935C13.53 2.40804 13.1484 2.25 12.7505 2.25H5.24968C4.85181 2.25 4.47024 2.40804 4.1889 2.68935C3.90756 2.97066 3.74951 3.35219 3.74951 3.75003V15.0002C3.74955 15.1316 3.78409 15.2606 3.84966 15.3744C3.91524 15.4882 4.00955 15.5828 4.12316 15.6487C4.23678 15.7146 4.36571 15.7496 4.49706 15.75C4.62842 15.7504 4.75758 15.7164 4.87164 15.6512L8.25603 13.7177C8.48265 13.5883 8.73912 13.5202 9.00011 13.5202C9.2611 13.5202 9.51757 13.5883 9.7442 13.7177L13.1286 15.6512C13.2426 15.7164 13.3718 15.7504 13.5032 15.75C13.6345 15.7496 13.7634 15.7146 13.8771 15.6487C13.9907 15.5828 14.085 15.4882 14.1506 15.3744C14.2161 15.2606 14.2507 15.1316 14.2507 15.0002V3.75003C14.2507 3.35219 14.0927 2.97066 13.8113 2.68935Z" strokeWidth="1.6" strokeLinecap="round" stroke="currentColor" />
+  </svg>
+)
+
 export const Panda = (props) => (
   <svg width="180" height="174" viewBox="0 0 180 174" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden {...props}>
     <g fillRule="evenodd" clipRule="evenodd">

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { motion, useAnimation, useMotionValue, useTransform } from 'framer-motion'
 import { sound } from '../utils/sound.js'
+import { BookmarkMuted } from './icons.jsx'
 
 const SWIPE = 84 // px, после которых свайп считается ответом
 
@@ -25,7 +26,8 @@ function useSwipeFeedback(x) {
 
 // карточка: клик → 3D-флип, свайп → ответ; exit улетает в сторону последнего ответа
 // fast=true — блиц: втрое короче пружины, карточки летят быстрее
-export default function FlipCard({ card, stackDepth = 0, shakeKey = 0, flipKey = 0, fast = false, onAnswer }) {
+// wide=true — раскладка макета 50:797: во весь контейнер, bookmark, подсказка снизу
+export default function FlipCard({ card, stackDepth = 0, shakeKey = 0, flipKey = 0, fast = false, wide = false, onAnswer }) {
   const [flipped, setFlipped] = useState(false)
   const x = useMotionValue(0)
   const { rotate, boxShadow, nahOpacity, knowOpacity } = useSwipeFeedback(x)
@@ -48,6 +50,8 @@ export default function FlipCard({ card, stackDepth = 0, shakeKey = 0, flipKey =
     if (info.offset.x > SWIPE) onAnswer({ known: true, swipe: true })
     else if (info.offset.x < -SWIPE) onAnswer({ known: false, swipe: true })
   }
+
+  const radius = wide ? '12px' : '12px_120px_12px_12px'
 
   return (
     <motion.div
@@ -78,30 +82,52 @@ export default function FlipCard({ card, stackDepth = 0, shakeKey = 0, flipKey =
       >
         {/* лицо: вопрос */}
         <div
-          className="absolute inset-0 flex flex-col overflow-hidden rounded-[12px_120px_12px_12px] border border-line bg-white p-9"
-          style={{ backfaceVisibility: 'hidden' }}
+          className={`absolute inset-0 flex flex-col overflow-hidden rounded-[12px] border border-[#dedfd6] bg-white p-10 ${wide ? 'items-center' : ''}`}
+          style={{ backfaceVisibility: 'hidden', borderRadius: radius, boxShadow: '0px 8px 28px 0px rgba(36,39,32,0.04)' }}
         >
-          <div className="flex items-center gap-2.5">
-            <span className="size-1.5 bg-primary" />
-            <span className="text-xs uppercase tracking-[1.2px] text-primary">Термин</span>
+          <div className={`flex w-full items-center ${wide ? 'justify-between' : 'justify-start gap-2.5'}`}>
+            <span className="flex items-center gap-2.5">
+              <span className="size-1.5 bg-primary" />
+              <span className="text-[10px] uppercase tracking-[1.2px] text-primary">Вопрос</span>
+            </span>
+            {wide && <BookmarkMuted className="size-[18px] text-[#85857d]" />}
           </div>
-          <p className="mt-6 text-[30px] font-semibold leading-[1.15] tracking-[-0.5px] break-words">{card.question}</p>
-          <p className="mt-auto text-xs text-muted">нажми на карточку или пробел — перевернётся</p>
+          <div className={`flex w-full flex-1 flex-col items-center justify-center ${wide ? 'text-center' : ''}`}>
+            <p className={wide
+              ? 'max-w-[650px] text-[36px] font-medium leading-[1.28] tracking-[-1.1px]'
+              : 'mt-6 text-[30px] font-semibold leading-[1.15] tracking-[-0.5px] break-words'}
+            >
+              {card.question}
+            </p>
+          </div>
+          <p className={`w-full text-xs text-[#85857d] ${wide ? 'text-center' : 'mt-auto'}`}>
+            {wide ? 'Попробуй ответить мысленно, прежде чем смотреть ответ.' : 'нажми на карточку или пробел — перевернётся'}
+          </p>
         </div>
 
         {/* изнанка: ответ + source_quote */}
         <div
-          className="absolute inset-0 flex flex-col overflow-hidden rounded-[12px_120px_12px_12px] border border-line bg-white p-9"
-          style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
+          className={`absolute inset-0 flex flex-col overflow-hidden rounded-[12px] border border-[#dedfd6] bg-white p-10 ${wide ? 'items-center' : ''}`}
+          style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)', borderRadius: radius, boxShadow: '0px 8px 28px 0px rgba(36,39,32,0.04)' }}
         >
-          <div className="flex items-center gap-2.5">
-            <span className="size-1.5 bg-primary" />
-            <span className="text-xs uppercase tracking-[1.2px] text-primary">Определение</span>
+          <div className={`flex w-full items-center ${wide ? 'justify-between' : 'justify-start gap-2.5'}`}>
+            <span className="flex items-center gap-2.5">
+              <span className="size-1.5 bg-primary" />
+              <span className="text-[10px] uppercase tracking-[1.2px] text-primary">Ответ</span>
+            </span>
+            {wide && <BookmarkMuted className="size-[18px] text-[#85857d]" />}
           </div>
-          <p className="mt-6 text-[22px] leading-[1.35] tracking-[-0.3px] break-words">{card.answer}</p>
-          <div className="mt-auto border-t border-line pt-4">
-            <p className="font-serif text-xs italic leading-[1.5] text-muted">«{card.source_quote}»</p>
-            {card.topic && <p className="mt-2 text-[10px] uppercase tracking-[1px] text-muted/70">{card.topic}</p>}
+          <div className={`flex w-full flex-1 flex-col justify-center ${wide ? 'items-center text-center' : ''}`}>
+            <p className={wide
+              ? 'max-w-[650px] text-[28px] font-medium leading-[1.3] tracking-[-0.7px]'
+              : 'mt-6 text-[22px] leading-[1.35] tracking-[-0.3px] break-words'}
+            >
+              {card.answer}
+            </p>
+          </div>
+          <div className={`w-full ${wide ? 'text-center' : 'mt-auto border-t border-line pt-4'}`}>
+            <p className="font-serif text-xs italic leading-[1.5] text-[#85857d]">«{card.source_quote}»</p>
+            {card.topic && <p className="mt-2 text-[10px] uppercase tracking-[1px] text-[#85857d]/70">{card.topic}</p>}
           </div>
         </div>
       </motion.div>

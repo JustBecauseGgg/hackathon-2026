@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import FlipCard from '../components/FlipCard.jsx'
 import MagneticButton from '../components/MagneticButton.jsx'
-import { ArrowUpRight } from '../components/icons.jsx'
+import { ArrowUpRight, CheckPlain, MoveLeft, MoveRight, Rotate3D, XClose } from '../components/icons.jsx'
 import { useApp } from '../store.js'
 import { sound } from '../utils/sound.js'
 
@@ -24,12 +24,12 @@ export default function Deck() {
   const locked = useRef(false)
 
   const knownCount = cards.filter((c) => (streaks[c.id] || 0) >= 1).length
-  const done = knownCount / cards.length
+  const done = cards.length ? knownCount / cards.length : 0
   const completed = cards.length > 0 && !queue.length
 
   const currentId = queue[0]
   const current = cards.find((c) => c.id === currentId)
-  const behind = queue.slice(1, 3).map((id) => cards.find((c) => c.id === id))
+  const answeredCount = stats.answered
 
   function handleAnswer({ known, swipe = false }) {
     if (locked.current || !currentId) return
@@ -108,96 +108,106 @@ export default function Deck() {
     )
   }
 
-  /* ── игровой экран ── */
+  /* ── игровой экран по макету 50:797 ── */
   return (
     <motion.section
       variants={rise} initial="hidden" animate="show" exit={{ opacity: 0, y: -16, transition: { duration: 0.2 } }}
-      className="flex flex-1 flex-col px-16 py-10"
+      className="flex flex-1 flex-col items-center gap-7 px-16 pb-12 pt-10"
     >
-      <div className="flex items-end justify-between">
-        <div className="flex items-center gap-2.5">
-          <span className="size-1.5 bg-primary" />
-          <span className="text-xs uppercase tracking-[1.2px] text-primary">Колода{topic ? ` · ${topic}` : ''}</span>
+      <div className="flex w-full max-w-[800px] flex-col gap-5">
+        {/* режимы + таймер */}
+        <motion.div variants={rise} custom={0} className="flex items-center justify-between">
+          <div className="flex items-start gap-1 rounded-[6px] bg-[#eeede5] p-1">
+            <span className="rounded-[4px] bg-white px-4 py-[9px] text-xs font-medium text-primary">Карточки</span>
+            <button
+              onClick={() => setScreen('blitz')}
+              className="cursor-pointer rounded-[4px] px-4 py-[9px] text-xs text-muted transition-colors hover:text-primary"
+            >
+              Блиц
+            </button>
+          </div>
+          <span className="text-xs text-muted">Без таймера</span>
+        </motion.div>
+
+        {/* название подборки + счётчик */}
+        <motion.div variants={rise} custom={1} className="flex items-end justify-between">
+          <div className="flex flex-col gap-[7px]">
+            <span className="text-[10px] tracking-[1px] text-primary uppercase">{topic || 'Конспект'}</span>
+            <h1 className="text-[28px] font-medium leading-[1.2] tracking-[-0.7px]">
+              {topic || 'Карточки из конспекта'}
+            </h1>
+          </div>
+          <span className="text-[13px] text-muted">{knownCount} из {cards.length}</span>
+        </motion.div>
+
+        {/* тонкий прогресс-бар */}
+        <div className="h-1 w-full overflow-hidden rounded-[2px] bg-line">
+          <motion.div
+            className="h-full rounded-[2px] bg-primary"
+            animate={{ width: `${Math.round(done * 100)}%` }}
+            transition={{ duration: 0.45, ease: 'easeOut' }}
+          />
         </div>
-        <span className="text-xs text-muted">выучено {knownCount} / {cards.length} · в очереди {queue.length}</span>
       </div>
 
-      {/* градиентный прогресс: доля закрытых «Знаю» карточек */}
-      <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-line/60">
-        <motion.div
-          className="h-full rounded-full"
-          style={{ background: 'linear-gradient(90deg, #720a18, #b14a3a)' }}
-          animate={{ width: `${Math.round(done * 100)}%` }}
-          transition={{ duration: 0.45, ease: 'easeOut' }}
-        />
-      </div>
-
-      <div className="flex flex-1 items-center justify-center py-6">
-        <div className="relative h-[540px] w-[420px]" style={{ perspective: 1400 }}>
-          {/* стек: следующие карты позади, мельче и ниже */}
-          {behind.map((c, i) => {
-            if (!c) return null
-            const depth = i + 1
-            return (
-              <div
-                key={c.id}
-                className="absolute inset-0 rounded-[12px_120px_12px_12px] border border-line bg-white p-8"
-                style={{
-                  transform: `scale(${1 - depth * 0.045}) translateY(${depth * 18}px)`,
-                  opacity: 1 - depth * 0.3,
-                  zIndex: 10 - depth,
-                  boxShadow: '0 18px 40px -24px rgba(32, 37, 31, 0.25)',
-                }}
-              >
-                <div className="flex items-center gap-2.5">
-                  <span className="size-1.5 bg-primary/50" />
-                  <span className="text-[10px] uppercase tracking-[1.2px] text-muted">Термин</span>
-                </div>
-                <p className="mt-5 text-[20px] font-semibold tracking-tight text-muted/80">{c.question}</p>
-              </div>
-            )
-          })}
-
-          {/* верхняя карта, живёт между экранами встречи через AnimatePresence */}
-          {current && (
-            <AnimatePresence custom={dir} mode="sync">
+      {/* карточка-вопрос (та же FlipCard: свайпы, флип, печати) */}
+      <motion.div variants={rise} custom={2} className="flex w-full max-w-[800px] flex-1 items-center justify-center py-2">
+        <div className="relative h-[340px] w-full" style={{ perspective: 1400 }}>
+          <AnimatePresence custom={dir} mode="sync">
+            {current && (
               <FlipCard
                 key={currentId}
                 card={current}
+                wide
                 shakeKey={shakeKey}
                 flipKey={flipKey}
                 onAnswer={handleAnswer}
               />
-            </AnimatePresence>
-          )}
+            )}
+          </AnimatePresence>
         </div>
-      </div>
+      </motion.div>
 
-      {/* кнопки */}
-      <div className="flex items-center justify-center gap-4 pb-2">
-        <motion.button
-          whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.94 }}
-          onClick={() => handleAnswer({ known: false })}
-          className="flex h-14 items-center rounded-md border-2 border-[#b3261e] px-8 text-base font-medium text-[#b3261e] transition-colors hover:bg-[#b3261e]/5"
-        >
-          Не знаю
-        </motion.button>
+      {/* управление карточкой */}
+      <motion.div variants={rise} custom={3} className="flex w-full max-w-[800px] items-center justify-center gap-4">
         <button
-          onClick={() => setFlipKey((k) => k + 1)}
-          className="rounded-md px-4 py-2 text-sm text-muted transition-colors hover:text-primary"
+          onClick={() => handleAnswer({ known: false })}
+          className="flex h-14 w-[240px] cursor-pointer items-center justify-center gap-[10px] rounded-[6px] border border-line bg-white text-sm font-medium transition-colors hover:border-[#b3261e] hover:text-[#b3261e]"
         >
-          Показать ответ
+          <XClose className="size-[18px]" />
+          Не знаю
         </button>
         <MagneticButton
-          onClick={() => handleAnswer({ known: true })}
-          className="flex h-14 items-center rounded-md bg-[#2f7d4f] px-8 text-base font-medium text-white"
+          onClick={() => setFlipKey((k) => k + 1)}
+          className="flex h-14 w-[288px] cursor-pointer items-center justify-center gap-[10px] rounded-[6px] border border-primary bg-gradient-to-r from-primary to-[#ac1328] text-sm font-medium text-white"
         >
-          Знаю
+          <Rotate3D className="size-[18px]" />
+          Показать ответ
         </MagneticButton>
-      </div>
-      <p className="pb-2 text-center text-[11px] text-muted/70">
-        свайп ← не знаю · свайп → знаю · пробел — перевернуть
-      </p>
+        <button
+          onClick={() => handleAnswer({ known: true })}
+          className="flex h-14 w-[240px] cursor-pointer items-center justify-center gap-[10px] rounded-[6px] border border-line bg-white text-sm font-medium transition-colors hover:border-[#2f7d4f] hover:text-[#2f7d4f]"
+        >
+          <CheckPlain className="size-[18px]" />
+          Знаю
+        </button>
+      </motion.div>
+
+      {/* как учиться: жесты + подсказка */}
+      <motion.div variants={rise} custom={4} className="flex w-full max-w-[800px] flex-col items-center gap-3">
+        <div className="flex items-center gap-8 text-xs text-muted">
+          <span className="flex items-center gap-[7px]">
+            <MoveLeft className="size-4" /> Влево — «Не знаю»
+          </span>
+          <span className="flex items-center gap-[7px]">
+            Вправо — «Знаю» <MoveRight className="size-4" />
+          </span>
+        </div>
+        <p className="text-center text-xs leading-[1.65] text-muted">
+          Листай карточки свайпом или используй кнопки.<br />
+          Незнакомые карточки вернутся раньше для повторения.
+        </p>
+      </motion.div>
     </motion.section>
   )
 }
