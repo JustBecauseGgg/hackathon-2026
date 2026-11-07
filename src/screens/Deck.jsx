@@ -23,7 +23,7 @@ export default function Deck() {
   const [flipKey, setFlipKey] = useState(0)
   const locked = useRef(false)
 
-  const knownCount = cards.filter((c) => (streaks[c.id] || 0) >= 2).length
+  const knownCount = cards.filter((c) => (streaks[c.id] || 0) >= 1).length
   const done = knownCount / cards.length
   const completed = cards.length > 0 && !queue.length
 
@@ -76,7 +76,7 @@ export default function Deck() {
             Каждая карточка — <span className="font-serif italic tracking-normal text-primary">знаешь.</span>
           </motion.h1>
           <motion.p variants={rise} custom={2} className="mt-4 text-lg text-muted">
-            Каждая карточка набрала «Знаю» два раза подряд. Интервалы сработали.
+            Каждая карточка закрыта «Знаю». Ошибки вернулись в очередь — интервалы сработали.
           </motion.p>
 
           <motion.div variants={rise} custom={3} className="mt-10 grid w-full grid-cols-4 gap-px overflow-hidden rounded-md border border-line bg-line">
@@ -122,7 +122,7 @@ export default function Deck() {
         <span className="text-xs text-muted">выучено {knownCount} / {cards.length} · в очереди {queue.length}</span>
       </div>
 
-      {/* градиентный прогресс: доля карточек с «Знаю» ×2 */}
+      {/* градиентный прогресс: доля закрытых «Знаю» карточек */}
       <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-line/60">
         <motion.div
           className="h-full rounded-full"

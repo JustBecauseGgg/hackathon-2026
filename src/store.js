@@ -28,7 +28,7 @@ export const useApp = create((set, get) => ({
   genError: null,
   // история завершённых прогонов — данные дашборда (mock, в памяти)
   decks: [],
-  // очередь: id-шники карточек «на столе»; карточка уходит, когда «Знаю» ×2 подряд
+  // очередь: id-шники карточек «на столе»; «Знаю» — карточка уходит, «Не знаю» — возвращается через 2
   queue: [],
   streaks: {},
   stats: { answered: 0, known: 0, wrong: 0, startedAt: null, finishedAt: null },
@@ -48,15 +48,15 @@ export const useApp = create((set, get) => ({
     },
 
   //.interval-логика: «Не знаю» — стрик сброс и назад через 2 карточки;
-  // «Знаю» — +1 стрик, если ещё не 2 → назад через 3 карточки, иначе уходит навсегда
+  // «Знаю» — карточка уходит (настоящее SRS нужно для длинных колод; ×1 — чтобы демо не зацикливалось)
   answer(known) {
     const { queue, streaks, stats, cards } = get()
     if (!queue.length) return
     const [id, ...rest] = queue
     const nextStreaks = { ...streaks, [id]: known ? (streaks[id] || 0) + 1 : 0 }
     let nextQueue = rest
-    if (nextStreaks[id] < 2 && nextQueue.length) {
-      const at = Math.min(known ? 3 : 2, nextQueue.length)
+    if (!known) {
+      const at = Math.min(2, nextQueue.length)
       nextQueue = [...nextQueue.slice(0, at), id, ...nextQueue.slice(at)]
     }
     const nextStats = {
